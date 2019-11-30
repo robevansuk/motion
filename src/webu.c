@@ -1968,6 +1968,9 @@ static void webu_start_strm(struct context **cnt){
             webu_mhd_features(&mhdst);
             webu_mhd_opts(&mhdst);
             webu_mhd_flags(&mhdst);
+
+
+            // START HERE
             if (mhdst.indxthrd == 0){
                 cnt[mhdst.indxthrd]->webstream_daemon = MHD_start_daemon (mhdst.mhd_flags
                     ,cnt[mhdst.indxthrd]->conf.stream_port
@@ -1983,12 +1986,16 @@ static void webu_start_strm(struct context **cnt){
                     ,MHD_OPTION_ARRAY, mhdst.mhd_ops
                     ,MHD_OPTION_END);
             }
+
+
+
             free(mhdst.mhd_ops);
             if (cnt[mhdst.indxthrd]->webstream_daemon == NULL){
                 MOTION_LOG(NTC, TYPE_STREAM, NO_ERRNO
                     ,_("Unable to start stream for camera %d")
                     ,cnt[mhdst.indxthrd]->camera_id);
             } else {
+                // SHOULD LOG WHERE CAM STARTED
                 webu_strm_ntc(cnt,mhdst.indxthrd);
             }
         }
