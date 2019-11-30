@@ -403,50 +403,6 @@ static void sigchild_handler(int signo ATTRIBUTE_UNUSED)
 }
 
 /**
- * setup_signals
- *   Attaches handlers to a number of signals that Motion need to catch.
- */
-static void setup_signals(void){
-    /*
-     * Setup signals and do some initialization. 1 in the call to
-     * 'motion_startup' means that Motion will become a daemon if so has been
-     * requested, and argc and argc are necessary for reading the command
-     * line options.
-     */
-    struct sigaction sig_handler_action;
-    struct sigaction sigchild_action;
-
-#ifdef SA_NOCLDWAIT
-    sigchild_action.sa_flags = SA_NOCLDWAIT;
-#else
-    sigchild_action.sa_flags = 0;
-#endif
-    sigchild_action.sa_handler = sigchild_handler;
-    sigemptyset(&sigchild_action.sa_mask);
-#ifdef SA_RESTART
-    sig_handler_action.sa_flags = SA_RESTART;
-#else
-    sig_handler_action.sa_flags = 0;
-#endif
-    sig_handler_action.sa_handler = sig_handler;
-    sigemptyset(&sig_handler_action.sa_mask);
-
-    /* Enable automatic zombie reaping */
-    sigaction(SIGCHLD, &sigchild_action, NULL);
-    sigaction(SIGPIPE, &sigchild_action, NULL);
-    sigaction(SIGALRM, &sig_handler_action, NULL);
-    sigaction(SIGHUP, &sig_handler_action, NULL);
-    sigaction(SIGINT, &sig_handler_action, NULL);
-    sigaction(SIGQUIT, &sig_handler_action, NULL);
-    sigaction(SIGTERM, &sig_handler_action, NULL);
-    sigaction(SIGUSR1, &sig_handler_action, NULL);
-
-    /* use SIGVTALRM as a way to break out of the ioctl, don't restart */
-    sig_handler_action.sa_flags = 0;
-    sigaction(SIGVTALRM, &sig_handler_action, NULL);
-}
-
-/**
  * motion_remove_pid
  *   This function remove the process id file ( pid file ) before motion exit.
  */
@@ -3306,6 +3262,7 @@ static void motion_startup(int daemonize, int argc, char *argv[])
         MOTION_LOG(NTC, TYPE_ALL, NO_ERRNO, _("Logging to syslog"));
     }
 
+    // motion logging started - app still not started yet
     MOTION_LOG(NTC, TYPE_ALL, NO_ERRNO, "Motion %s Started",VERSION);
 
     if ((cnt_list[0]->conf.log_type == NULL) ||
@@ -3639,8 +3596,6 @@ int main (int argc, char **argv)
     /* Create the TLS key for thread number. */
     pthread_key_create(&tls_key_threadnr, NULL);
     pthread_setspecific(tls_key_threadnr, (void *)(0));
-
-    setup_signals();
 
     motion_startup(1, argc, argv);
 
