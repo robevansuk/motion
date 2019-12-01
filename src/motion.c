@@ -3302,6 +3302,10 @@ static void motion_startup(int daemonize, int argc, char *argv[])
 
     initialize_chars();
 
+    /*
+     * CAMERA - this starts the MHD - libmicrohttpd (http server).
+     * lots of references to this mhd and its various options within.
+     */
     webu_start(cnt_list);
 
     vid_mutex_init();

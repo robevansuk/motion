@@ -1995,8 +1995,17 @@ static void webu_start_strm(struct context **cnt){
                     ,_("Unable to start stream for camera %d")
                     ,cnt[mhdst.indxthrd]->camera_id);
             } else {
-                // SHOULD LOG WHERE CAM STARTED
+
+                /**
+                 *
+                 *
+                 * SHOULD LOG WHERE CAM STARTED
+                 *
+                 *
+                 */
                 webu_strm_ntc(cnt,mhdst.indxthrd);
+
+
             }
         }
         mhdst.indxthrd++;
